@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <title>SOC Bildirim Aracı</title>
+  <style>
+    body { font-family:Arial,sans-serif; max-width:900px; margin:20px auto; padding:0 15px; }
+    h1 { text-align:center; margin-bottom:20px; }
+    .field { margin-bottom:10px; }
+    label { display:block; font-weight:bold; margin-bottom:4px; }
+    input, select, textarea { width:100%; padding:6px; font-size:14px; border:1px solid #ccc; border-radius:4px; }
+    textarea { min-height:120px; resize:vertical; }
+    
+    .form-container { 
+      background:#f8f9fa; 
+      border:1px solid #ddd; 
+      border-radius:8px; 
+      padding:20px;
+      margin-bottom:15px;
+    }
+
+    #copyBtn {
+      display: block;
+      width: 100%;
+      padding: 14px 20px;
+      font-size: 18px;
+      color: white;
+      background-color: #2ecc71;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 20px 0;
+    }
+    #copyBtn:hover { background-color: #27ae60; }
+    #copyBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+    
+    #emailBtn {
+      display: block;
+      width: 100%;
+      padding: 14px 20px;
+      font-size: 18px;
+      color: white;
+      background-color: #3498db;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 10px 0;
+    }
+    #emailBtn:hover { background-color: #2980b9; }
+    
+    #copy-status {
+      margin:10px 0;
+      padding:8px;
+      border-radius:4px;
+      display:none;
+      text-align:center;
+      font-weight:bold;
+      background:#e8f4fc;
+      border:1px solid #bde0fe;
+      color:#0077cc;
+    }
+  </style>
+</head>
+<body>
+  <h1>SOC Bildirim Aracı</h1>
+
+  <div class="form-container">
+    <div class="field">
+      <label for="severity">Severity Seçiniz</label>
+      <select id="severity">
+        <option value="Low"    data-color="#2e7d32">Low</option>
+        <option value="Medium" data-color="#f9a825" selected>Medium</option>
+        <option value="High"   data-color="#c62828">High</option>
+        <option value="Critical" data-color="#8e0000">Critical</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="category">Alert Category</label>
+      <select id="category">
+        <option value="" disabled selected>Seçiniz</option>
+        <option>Anomaly</option><option>Authentication</option>
+        <option>Ddos/Dos</option><option>Exploit</option>
+        <option>Malware</option><option>Policy</option>
+        <option>Recon</option><option>Suspicious Activity</option>
+        <option>Threat</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="caseNumber">Case Numarası</label>
+      <input type="text" id="caseNumber" value="55586" placeholder="Vaka numarası">
+    </div>
+    <div class="field">
+      <label for="alertName">Alert Name</label>
+      <input type="text" id="alertName" placeholder="Alert Name giriniz">
+    </div>
+    <div class="field">
+      <label for="alertLink">Alert Name Link (URL)</label>
+      <input type="url" id="alertLink" placeholder="https://…/cases/33580">
+    </div>
+    <div class="field">
+      <label for="rules">Triggered Rules</label>
+      <input type="text" id="rules" placeholder="Tek satır ">
+    </div>
+    <div class="field">
+      <label for="source">Incident Source</label>
+      <input type="text" id="source" placeholder="Tek satır ">
+    </div>
+    <div class="field">
+      <label for="logs">Related Log Sources</label>
+      <input type="text" id="logs" placeholder="Tek satır ">
+    </div>
+    <div class="field">
+      <label for="description">Analyst Description</label>
+      <textarea id="description" style="height:200px;">Date: Tarih Giriniz
+Source IP:
+Destination IP:
+
+"..." Source IP adresi üzerinden "..." Destination IP adresi üzerine oluşan bağlantı istekleri sebebi ile alarm oluşmuştur.
+
+Related Activities: Offense dışı loglar incelendiğinde farklı riskli bir aktivite görülmemiştir.</textarea>
+    </div>
+    <div class="field">
+      <label for="suggestion">Analyst Suggestion</label>
+      <textarea id="suggestion">Gerçekleştirilen aktivitelerin bilgi dahilinde olmaması durumunda ilgili cihaz üzerinde gerekli kontrollerin yapılması önerilir.
+
+Gerçekleşen işlemler bilgi dahilinde ise alınacak bir aksiyon yoktur.
+
+Alınacak aksiyonların tarafımızca da takibi ve kontrolünün sağlanması için geri dönüşlerinizi rica ederiz.</textarea>
+    </div>
+  </div>
+
+  <div id="copy-status"></div>
+  <button id="copyBtn" disabled>Raporu Kopyala</button>
+  <button id="emailBtn" onclick="openEmailClient()">E-posta İstemcisini Aç</button>
+
+  <script>
+  function getSubject() {
+    const severity = document.getElementById("severity").value;
+    const caseNum = document.getElementById("caseNumber").value;
+    return `[Sahibinden] ${severity} Severity Incident #${caseNum}`;
+  }
+  
+  function openEmailClient() {
+    const subject = getSubject();
+    const mailtoLink = `mailto:socmdrmonitoring@kafein.com.tr?cc=bilgiguvenligi@sahibinden.com.tr&subject=${encodeURIComponent(subject)}`;
+    window.open(mailtoLink);
+  }
+function buildHTML() {
+    const sevEl     = document.getElementById("severity");
+    const color     = sevEl.selectedOptions[0].dataset.color;
+    const sevTxt    = sevEl.value.toUpperCase();
+    const titleClr  = sevTxt==="HIGH"?"#000":"#fff";
+    const cat       = document.getElementById("category").value;
+    const name      = document.getElementById("alertName").value;
+    const link      = document.getElementById("alertLink").value;
+    const rules     = document.getElementById("rules").value;
+    const src       = document.getElementById("source").value;
+    const logs      = document.getElementById("logs").value;
+    const desc      = document.getElementById("description").value.replace(/\n/g,"<br>");
+    const sugg      = document.getElementById("suggestion").value.replace(/\n/g,"<br>");
+    const logo      = "data:image/png;base64,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";
+    const subject   = getSubject();
+    const caseNum   = document.getElementById("caseNumber").value;
+
+    return `
+<div style="font-family:Arial,sans-serif;color:#333;">
+  <p>Merhabalar,</p>
+  <p>SOC hizmeti kapsamında yapılan olay bildirimi ile ilgili kontrollerinizi rica ederiz.</p>
+  <table style="width:100%;border-collapse:collapse;border:2px solid ${color};">
+    <tr>
+      <th style="background:#e5e5e5;width:20%;text-align:center;border:1px solid ${color};padding:12px;vertical-align:middle;">
+        <img src="${logo}" height="40" style="display:block;margin:0 auto;">
+      </th>
+      <th style="background:${color};color:${titleClr};width:80%;text-align:center;border:1px solid ${color};padding:12px;font-size:16px;font-weight:bold;">
+        ${sevTxt} SEVERITY INCIDENT NOTIFICATION
+      </th>
+    </tr>
+    <tr>
+      <th style="background:#e0e0e0;border:1px solid ${color};padding:12px;width:20%;text-align:center;font-weight:bold;">Alert Category</th>
+      <td style="border:1px solid ${color};padding:12px;width:80%;text-align:left;">${cat}</td>
+    </tr>
+    <tr>
+      <th style="background:#e0e0e0;border:1px solid ${color};padding:12px;width:20%;text-align:center;font-weight:bold;">Alert Name</th>
+      <td style="border:1px solid ${color};padding:12px;width:80%;text-align:left;">
+        <a href="${link}" style="color:#4ea5d9;text-decoration:underline;">${name}</a>
+      </td>
+    </tr>
+    <tr>
+      <th style="background:#e0e0e0;border:1px solid ${color};padding:12px;width:20%;text-align:center;font-weight:bold;">Triggered Rules</th>
+      <td style="border:1px solid ${color};padding:12px;width:80%;text-align:left;">${rules}</td>
+    </tr>
+    <tr>
+      <th style="background:#e0e0e0;border:1px solid ${color};padding:12px;width:20%;text-align:center;font-weight:bold;">Incident Source</th>
+      <td style="border:1px solid ${color};padding:12px;width:80%;text-align:left;">${src}</td>
+    </tr>
+    <tr>
+      <th style="background:#e0e0e0;border:1px solid ${color};padding:12px;width:20%;text-align:center;font-weight:bold;">Related Log Sources</th>
+      <td style="border:1px solid ${color};padding:12px;width:80%;text-align:left;">${logs}</td>
+    </tr>
+    <tr>
+      <th style="background:#e0e0e0;border:1px solid ${color};padding:12px;width:20%;text-align:center;font-weight:bold;vertical-align:top;">Analyst Description</th>
+      <td style="border:1px solid ${color};padding:12px;width:80%;text-align:left;">${desc}</td>
+    </tr>
+    <tr>
+      <th style="background:#e0e0e0;border:1px solid ${color};padding:12px;width:20%;text-align:center;font-weight:bold;vertical-align:top;">Analyst Suggestion</th>
+      <td style="border:1px solid ${color};padding:12px;width:80%;text-align:left;">${sugg}</td>
+    </tr>
+    <tr>
+      <th style="background:#e0e0e0;border:1px solid ${color};padding:12px;width:20%;text-align:center;font-weight:bold;">Customer Reply</th>
+      <td style="border:1px solid ${color};padding:12px;width:80%;text-align:center;">
+        <a href="#" onclick="window.location.href='mailto:socmdrmonitoring@kafein.com.tr?cc=bilgiguvenligi@sahibinden.com.tr&subject=Re: ${encodeURIComponent(subject)}&body=${encodeURIComponent('Response Type: Known Activity\\n\\nComment:\\n')}'; return false;" 
+           style="color:#4ea5d9;text-decoration:underline;margin:0 5px;">Known Activity</a> | 
+        <a href="#" onclick="window.location.href='mailto:socmdrmonitoring@kafein.com.tr?cc=bilgiguvenligi@sahibinden.com.tr&subject=Re: ${encodeURIComponent(subject)}&body=${encodeURIComponent('Response Type: True Positive Resolved\\n\\nComment:\\n')}'; return false;" 
+           style="color:#4ea5d9;text-decoration:underline;margin:0 5px;">True Positive Resolved</a> | 
+        <a href="#" onclick="window.location.href='mailto:socmdrmonitoring@kafein.com.tr?cc=bilgiguvenligi@sahibinden.com.tr&subject=Re: ${encodeURIComponent(subject)}&body=${encodeURIComponent('Response Type: False Positive\\n\\nComment:\\n')}'; return false;" 
+           style="color:#4ea5d9;text-decoration:underline;margin:0 5px;">False Positive</a> | 
+        <a href="#" onclick="window.location.href='mailto:socmdrmonitoring@kafein.com.tr?cc=bilgiguvenligi@sahibinden.com.tr&subject=Re: ${encodeURIComponent(subject)}&body=${encodeURIComponent('Response Type: Other\\n\\nComment:\\n')}'; return false;" 
+           style="color:#4ea5d9;text-decoration:underline;margin:0 5px;">Other</a>
+      </td>
+    </tr>
+  </table>
+  <p>İyi çalışmalar,</p>
+  <p>Saygılarımızla,</p>
+</div>`;
+}
+
+
+
+
+
+
+
+
+  // Validasyon
+  const required = ["severity","category","alertName","alertLink"];
+  required.forEach(id => {
+    ["input","change"].forEach(evt =>
+      document.getElementById(id).addEventListener(evt,validate)
+    );
+  });
+  
+  function validate() {
+    const ok = required.every(id =>
+      document.getElementById(id).value.trim() !== ""
+    );
+    document.getElementById("copyBtn").disabled = !ok;
+  }
+
+  // Status mesajı göster
+  function showStatus(message) {
+    const status = document.getElementById("copy-status");
+    status.innerHTML = message;
+    status.style.display = "block";
+    setTimeout(() => { status.style.display = "none"; }, 3000);
+  }
+
+  // Kopyalama - Geçici DOM elementi kullanarak preview gizleme
+  document.getElementById("copyBtn").addEventListener("click", () => {
+    const html = buildHTML();
+    
+    // Geçici bir div oluştur (tamamen görünmez)
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    tempDiv.style.cssText = 'opacity:0;position:absolute;left:-9999px;top:-9999px;pointer-events:none;';
+    
+    // DOM'a ekle
+    document.body.appendChild(tempDiv);
+    
+    // Kopyala
+    const rng = document.createRange(), sel = window.getSelection();
+    rng.selectNodeContents(tempDiv.firstElementChild);
+    sel.removeAllRanges(); 
+    sel.addRange(rng);
+    document.execCommand("copy");
+    sel.removeAllRanges();
+    
+    // Geçici elementi temizle
+    document.body.removeChild(tempDiv);
+    
+    showStatus("✓ Rapor kopyalandı!");
+  });
+
+  // Sayfa yüklendiğinde validasyon yap
+  validate();
+  </script>
+</body>
+</html>
