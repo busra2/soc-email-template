@@ -111,7 +111,7 @@
     </div>
     <div class="field">
       <label for="description">Analyst Description</label>
-      <textarea id="description" style="height:200px;">Date: Tarih Giriniz
+      <textarea id="description" style="height:200px;">Date:Tarih Giriniz
 Source IP:
 Destination IP:
 
@@ -205,19 +205,16 @@ function buildHTML() {
       <th style="background:#e0e0e0;border:1px solid ${color};padding:12px;width:20%;text-align:center;font-weight:bold;vertical-align:top;">Analyst Suggestion</th>
       <td style="border:1px solid ${color};padding:12px;width:80%;text-align:left;">${sugg}</td>
     </tr>
-    <tr>
+   <tr>
       <th style="background:#e0e0e0;border:1px solid ${color};padding:12px;width:20%;text-align:center;font-weight:bold;">Customer Reply</th>
       <td style="border:1px solid ${color};padding:12px;width:80%;text-align:center;">
-        <a href="#" onclick="window.location.href='mailto:socmdrmonitoring@kafein.com.tr?cc=bilgiguvenligi@sahibinden.com.tr&subject=Re: ${encodeURIComponent(subject)}&body=${encodeURIComponent('Response Type: Known Activity\\n\\nComment:\\n')}'; return false;" 
-           style="color:#4ea5d9;text-decoration:underline;margin:0 5px;">Known Activity</a> | 
-        <a href="#" onclick="window.location.href='mailto:socmdrmonitoring@kafein.com.tr?cc=bilgiguvenligi@sahibinden.com.tr&subject=Re: ${encodeURIComponent(subject)}&body=${encodeURIComponent('Response Type: True Positive Resolved\\n\\nComment:\\n')}'; return false;" 
-           style="color:#4ea5d9;text-decoration:underline;margin:0 5px;">True Positive Resolved</a> | 
-        <a href="#" onclick="window.location.href='mailto:socmdrmonitoring@kafein.com.tr?cc=bilgiguvenligi@sahibinden.com.tr&subject=Re: ${encodeURIComponent(subject)}&body=${encodeURIComponent('Response Type: False Positive\\n\\nComment:\\n')}'; return false;" 
-           style="color:#4ea5d9;text-decoration:underline;margin:0 5px;">False Positive</a> | 
-        <a href="#" onclick="window.location.href='mailto:socmdrmonitoring@kafein.com.tr?cc=bilgiguvenligi@sahibinden.com.tr&subject=Re: ${encodeURIComponent(subject)}&body=${encodeURIComponent('Response Type: Other\\n\\nComment:\\n')}'; return false;" 
-           style="color:#4ea5d9;text-decoration:underline;margin:0 5px;">Other</a>
+        <a href="mailto:socmdrmonitoring@kafein.com.tr?subject=Re:%20${encodeURIComponent(subject)}&body=Response%20Type:%20Known%20Activity%0D%0A%0D%0AComment:%0D%0A" target="_top" style="color:#4ea5d9;text-decoration:underline;margin:0 5px;">Known Activity</a> | 
+        <a href="mailto:socmdrmonitoring@kafein.com.tr?subject=Re:%20${encodeURIComponent(subject)}&body=Response%20Type:%20True%20Positive%20Resolved%0D%0A%0D%0AComment:%0D%0A" target="_top" style="color:#4ea5d9;text-decoration:underline;margin:0 5px;">True Positive Resolved</a> | 
+        <a href="mailto:socmdrmonitoring@kafein.com.tr?subject=Re:%20${encodeURIComponent(subject)}&body=Response%20Type:%20False%20Positive%0D%0A%0D%0AComment:%0D%0A" target="_top" style="color:#4ea5d9;text-decoration:underline;margin:0 5px;">False Positive</a> | 
+        <a href="mailto:socmdrmonitoring@kafein.com.tr?subject=Re:%20${encodeURIComponent(subject)}&body=Response%20Type:%20Other%0D%0A%0D%0AComment:%0D%0A" target="_top" style="color:#4ea5d9;text-decoration:underline;margin:0 5px;">Other</a>
       </td>
     </tr>
+
   </table>
   <p>İyi çalışmalar,</p>
   <p>Saygılarımızla,</p>
