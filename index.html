@@ -86,8 +86,8 @@
       </select>
     </div>
     <div class="field">
-      <label for="caseNumber">Case Numarası</label>
-      <input type="text" id="caseNumber" value="55586" placeholder="Vaka numarası">
+      <label for="caseNumber">Case ID</label>
+      <input type="text" id="caseNumber"  placeholder="Vaka numarası">
     </div>
     <div class="field">
       <label for="alertName">Alert Name</label>
@@ -229,7 +229,7 @@ function buildHTML() {
 
 
   // Validasyon
-  const required = ["severity","category","alertName","alertLink"];
+  const required = ["severity","category","caseNumber","alertName","alertLink","rules","source","logs"];
   required.forEach(id => {
     ["input","change"].forEach(evt =>
       document.getElementById(id).addEventListener(evt,validate)
