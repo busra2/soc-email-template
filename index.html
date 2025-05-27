@@ -32,7 +32,11 @@
       margin: 20px 0;
     }
     #copyBtn:hover { background-color: #27ae60; }
-    #copyBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+    #copyBtn:disabled { 
+      opacity: 0.6; 
+      cursor: not-allowed !important;
+      background-color: #95a5a6 !important;
+    }
     
     #emailBtn {
       display: block;
@@ -67,16 +71,17 @@
   <div class="form-container">
     <div class="field">
       <label for="severity">Severity Seçiniz</label>
-      <select id="severity">
+      <select id="severity" autocomplete="off">
+        <option value="" disabled selected>Seçiniz</option>
         <option value="Low"    data-color="#2e7d32">Low</option>
-        <option value="Medium" data-color="#f9a825" selected>Medium</option>
+        <option value="Medium" data-color="#f9a825">Medium</option>
         <option value="High"   data-color="#c62828">High</option>
         <option value="Critical" data-color="#8e0000">Critical</option>
       </select>
     </div>
     <div class="field">
       <label for="category">Alert Category</label>
-      <select id="category">
+      <select id="category" autocomplete="off">
         <option value="" disabled selected>Seçiniz</option>
         <option>Anomaly</option><option>Authentication</option>
         <option>Ddos/Dos</option><option>Exploit</option>
@@ -87,27 +92,27 @@
     </div>
     <div class="field">
       <label for="caseNumber">Case ID</label>
-      <input type="text" id="caseNumber"  placeholder="Vaka numarası">
+      <input type="text" id="caseNumber" placeholder="Vaka numarası" autocomplete="off">
     </div>
     <div class="field">
       <label for="alertName">Alert Name</label>
-      <input type="text" id="alertName" placeholder="Alert Name giriniz">
+      <input type="text" id="alertName" placeholder="Alert Name giriniz" autocomplete="off">
     </div>
     <div class="field">
       <label for="alertLink">Alert Name Link (URL)</label>
-      <input type="url" id="alertLink" placeholder="https://…/cases/33580">
+      <input type="url" id="alertLink" placeholder="https://…/cases/33580" autocomplete="off">
     </div>
     <div class="field">
       <label for="rules">Triggered Rules</label>
-      <input type="text" id="rules" placeholder="Tek satır ">
+      <input type="text" id="rules" placeholder="Triggered Rules giriniz" autocomplete="off">
     </div>
     <div class="field">
       <label for="source">Incident Source</label>
-      <input type="text" id="source" placeholder="Tek satır ">
+      <input type="text" id="source" placeholder="Incident Source giriniz" autocomplete="off">
     </div>
     <div class="field">
       <label for="logs">Related Log Sources</label>
-      <input type="text" id="logs" placeholder="Tek satır ">
+      <input type="text" id="logs" placeholder="Related Log Sources giriniz" autocomplete="off">
     </div>
     <div class="field">
       <label for="description">Analyst Description</label>
@@ -134,6 +139,19 @@ Alınacak aksiyonların tarafımızca da takibi ve kontrolünün sağlanması i�
   <button id="emailBtn" onclick="openEmailClient()">E-posta İstemcisini Aç</button>
 
   <script>
+  // Sayfa yüklendiğinde çalışacak
+  document.addEventListener('DOMContentLoaded', function() {
+    const severitySelect = document.getElementById("severity");
+    severitySelect.selectedIndex = 0;
+    severitySelect.value = "";
+    
+    const categorySelect = document.getElementById("category");
+    categorySelect.selectedIndex = 0;
+    categorySelect.value = "";
+    
+    validate();
+  });
+
   function getSubject() {
     const severity = document.getElementById("severity").value;
     const caseNum = document.getElementById("caseNumber").value;
@@ -144,9 +162,9 @@ Alınacak aksiyonların tarafımızca da takibi ve kontrolünün sağlanması i�
     const subject = getSubject();
     const mailtoLink = `mailto:bilgiguvenligi@sahibinden.com.tr?cc=socmdrmonitoring@kafein.com.tr&subject=${encodeURIComponent(subject)}`;
     window.open(mailtoLink);
-}
+  }
 
-function buildHTML() {
+  function buildHTML() {
     const sevEl     = document.getElementById("severity");
     const color     = sevEl.selectedOptions[0].dataset.color;
     const sevTxt    = sevEl.value.toUpperCase();
@@ -164,20 +182,11 @@ function buildHTML() {
     
     const subject   = getSubject();
 
-    // DEBUG: Konsola yazdır
-    console.log("Alert Name:", name);
-    console.log("Alert Link:", link);
-    console.log("Link var mı?", !!link);
-    console.log("Name var mı?", !!name);
-
-    // Alert Name linkini oluştur - Alert Name metni Alert Name URL'ye gidecek
     let alertNameDisplay;
     if (name && link && link.trim() !== "") {
         alertNameDisplay = `<a href="${link.trim()}" target="_blank" rel="noopener" style="color:#1976d2;text-decoration:underline;">${name}</a>`;
-        console.log("Alert Name linki oluşturuldu:", alertNameDisplay);
     } else {
         alertNameDisplay = name;
-        console.log("Alert Name sadece metin:", alertNameDisplay);
     }
 
     return `
@@ -234,29 +243,83 @@ function buildHTML() {
   <p>İyi çalışmalar,</p>
   <p>Saygılarımızla,</p>
 </div>`;
-}
+  }
 
+  // Form reset fonksiyonu
+  function resetFormForNewReport() {
+    document.getElementById("severity").selectedIndex = 0;
+    document.getElementById("severity").value = "";
+    document.getElementById("category").selectedIndex = 0;
+    document.getElementById("category").value = "";
+    
+    const caseNumField = document.getElementById("caseNumber");
+    const currentNum = parseInt(caseNumField.value) || 0;
+    caseNumField.value = (currentNum + 1).toString();
+    
+    document.getElementById("alertName").value = "";
+    document.getElementById("alertLink").value = "";
+    document.getElementById("rules").value = "";
+    document.getElementById("source").value = "";
+    document.getElementById("logs").value = "";
+    
+    document.getElementById("description").value = `Date:Tarih Giriniz
+Source IP:
+Destination IP:
 
+"..." Source IP adresi üzerinden "..." Destination IP adresi üzerine oluşan bağlantı istekleri sebebi ile alarm oluşmuştur.
 
+Related Activities: Offense dışı loglar incelendiğinde farklı riskli bir aktivite görülmemiştir.`;
 
+    document.getElementById("suggestion").value = `Gerçekleştirilen aktivitelerin bilgi dahilinde olmaması durumunda ilgili cihaz üzerinde gerekli kontrollerin yapılması önerilir.
 
+Gerçekleşen işlemler bilgi dahilinde ise alınacak bir aksiyon yoktur.
 
+Alınacak aksiyonların tarafımızca da takibi ve kontrolünün sağlanması için geri dönüşlerinizi rica ederiz.`;
 
+    validate();
+    document.getElementById("severity").focus();
+  }
 
   // Validasyon
   const required = ["severity","category","caseNumber","alertName","alertLink","rules","source","logs"];
-  required.forEach(id => {
-    ["input","change"].forEach(evt =>
-      document.getElementById(id).addEventListener(evt,validate)
-    );
-  });
   
   function validate() {
-    const ok = required.every(id =>
-      document.getElementById(id).value.trim() !== ""
-    );
-    document.getElementById("copyBtn").disabled = !ok;
+    const ok = required.every(id => {
+      const element = document.getElementById(id);
+      if (!element) return false;
+      
+      const value = element.value.trim();
+      
+      if (value === "") return false;
+      
+      if (element.tagName === "SELECT" && (value === "" || element.selectedIndex === 0)) {
+        return false;
+      }
+      
+      return true;
+    });
+    
+    const copyBtn = document.getElementById("copyBtn");
+    copyBtn.disabled = !ok;
+    
+    if (ok) {
+      copyBtn.style.backgroundColor = "#2ecc71";
+      copyBtn.style.cursor = "pointer";
+    } else {
+      copyBtn.style.backgroundColor = "#95a5a6";
+      copyBtn.style.cursor = "not-allowed";
+    }
   }
+
+  // Event listener'ları ekle
+  required.forEach(id => {
+    ["input","change"].forEach(evt => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.addEventListener(evt, validate);
+      }
+    });
+  });
 
   // Status mesajı göster
   function showStatus(message) {
@@ -266,34 +329,47 @@ function buildHTML() {
     setTimeout(() => { status.style.display = "none"; }, 3000);
   }
 
-  // Kopyalama - Geçici DOM elementi kullanarak preview gizleme
-  document.getElementById("copyBtn").addEventListener("click", () => {
-    const html = buildHTML();
+  // Arama sonuçlarından [1]: Temizle pop-up'u kaldırıldı
+  document.getElementById("copyBtn").addEventListener("click", function() {
+    const severitySelect = document.getElementById("severity");
+    const severityValue = severitySelect.value;
     
-    // Geçici bir div oluştur (tamamen görünmez)
+    if (!severityValue || severityValue === "") {
+        alert("⚠️ Severity değerini seçmeyi unuttun!");
+        if (!confirm("Severity seçmeden devam et?")) {
+            severitySelect.focus();
+            return false;
+        }
+    } else {
+        const selectedText = severitySelect.options[severitySelect.selectedIndex].text;
+        if (!confirm(`✅ Severity: "${selectedText}"\n\nRaporu kopyala?`)) {
+            return false;
+        }
+    }
+
+    // Kopyalama işlemi
+    const html = buildHTML();
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = html;
     tempDiv.style.cssText = 'opacity:0;position:absolute;left:-9999px;top:-9999px;pointer-events:none;';
-    
-    // DOM'a ekle
     document.body.appendChild(tempDiv);
-    
-    // Kopyala
     const rng = document.createRange(), sel = window.getSelection();
     rng.selectNodeContents(tempDiv.firstElementChild);
     sel.removeAllRanges(); 
     sel.addRange(rng);
     document.execCommand("copy");
     sel.removeAllRanges();
-    
-    // Geçici elementi temizle
     document.body.removeChild(tempDiv);
-    
-    showStatus("✓ Rapor kopyalandı!");
-  });
+    showStatus("✔ Rapor kopyalandı!");
 
-  // Sayfa yüklendiğinde validasyon yap
-  validate();
+    // YENI: Temizle pop-up'u kaldırıldı
+    // setTimeout(() => {
+    //     if(confirm("Yeni rapor için formu temizlemek ister misin?")) {
+    //         resetFormForNewReport();
+    //         showStatus("🔄 Form hazırlandı!");
+    //     }
+    // }, 500);
+  });
   </script>
 </body>
 </html>
