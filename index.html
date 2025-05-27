@@ -139,7 +139,7 @@ Alınacak aksiyonların tarafımızca da takibi ve kontrolünün sağlanması i�
   <button id="emailBtn" onclick="openEmailClient()">E-posta İstemcisini Aç</button>
 
   <script>
-  // Sayfa yüklendiğinde çalışacak
+  // Sayfa yüklendiğinde  burası aktif olacak.
   document.addEventListener('DOMContentLoaded', function() {
     const severitySelect = document.getElementById("severity");
     severitySelect.selectedIndex = 0;
@@ -245,7 +245,7 @@ Alınacak aksiyonların tarafımızca da takibi ve kontrolünün sağlanması i�
 </div>`;
   }
 
-  // Form reset fonksiyonu
+  // Form reset fonksiyonu ekledim.
   function resetFormForNewReport() {
     document.getElementById("severity").selectedIndex = 0;
     document.getElementById("severity").value = "";
@@ -280,7 +280,7 @@ Alınacak aksiyonların tarafımızca da takibi ve kontrolünün sağlanması i�
     document.getElementById("severity").focus();
   }
 
-  // Validasyon
+  // Validasyon kısmı. !!!
   const required = ["severity","category","caseNumber","alertName","alertLink","rules","source","logs"];
   
   function validate() {
@@ -321,7 +321,7 @@ Alınacak aksiyonların tarafımızca da takibi ve kontrolünün sağlanması i�
     });
   });
 
-  // Status mesajı göster
+
   function showStatus(message) {
     const status = document.getElementById("copy-status");
     status.innerHTML = message;
@@ -329,7 +329,7 @@ Alınacak aksiyonların tarafımızca da takibi ve kontrolünün sağlanması i�
     setTimeout(() => { status.style.display = "none"; }, 3000);
   }
 
-  // Arama sonuçlarından [1]: Temizle pop-up'u kaldırıldı
+ 
   document.getElementById("copyBtn").addEventListener("click", function() {
     const severitySelect = document.getElementById("severity");
     const severityValue = severitySelect.value;
@@ -362,13 +362,7 @@ Alınacak aksiyonların tarafımızca da takibi ve kontrolünün sağlanması i�
     document.body.removeChild(tempDiv);
     showStatus("✔ Rapor kopyalandı!");
 
-    // YENI: Temizle pop-up'u kaldırıldı
-    // setTimeout(() => {
-    //     if(confirm("Yeni rapor için formu temizlemek ister misin?")) {
-    //         resetFormForNewReport();
-    //         showStatus("🔄 Form hazırlandı!");
-    //     }
-    // }, 500);
+   
   });
   </script>
 </body>
