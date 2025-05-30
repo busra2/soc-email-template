@@ -1,8 +1,7 @@
 # soc-email-template
-SOC ekibi için olay bildirimi aracı
+Incident reporting tool for the SOC team.
 
-PNG için base64: https://www.base64-image.de/
+ base64 for PNG : https://www.base64-image.de/
 
-dummy resim: via.placeholder.com
 
 deployment: [Netlify](https://app.netlify.com/projects/soc-mail-template/overview)
